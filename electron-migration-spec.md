@@ -531,11 +531,11 @@ Displays all registered modules as **cards**. Each card shows:
 
 ### 6.3 Design System
 
-- **Theme**: Dark mode only. Background: `zinc-950`. Surface: `zinc-900`. Border: `zinc-800`.
-- **Accent Color**: Orange (`orange-500`). **Never use purple/violet.**
+- **Theme**: Dark mode only. Modern layout emphasizing depth and premium feel. Background: `zinc-950` with subtle radial or linear gradients. Surface: glassmorphism or translucent `zinc-900/50` with `border-white/10`.
+- **Accent Color**: Orange (`orange-500` to `orange-400` gradients, and glowing effects). **Never use purple/violet.**
 - **Typography**: `Inter` from Google Fonts (or system fallback `-apple-system`).
-- **Border radius**: `rounded-xl` (12px) for cards; `rounded-2xl` (16px) for panels.
-- **Animation**: Subtle — `transition-all duration-200`. Use `active:scale-95` on buttons.
+- **Border radius**: `rounded-xl` (12px) for cards; `rounded-2xl` (16px) for panels, with subtle inner highlights (e.g., `ring-1 ring-white/5`).
+- **Animation**: Smooth & modern — `transition-all duration-300 ease-out`. Use `active:scale-95` on buttons, `hover:-translate-y-1` on cards, and glow/gradient shifts on hover.
 
 ### 6.4 Adding a New Frontend Module (Convention)
 

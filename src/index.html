@@ -7,7 +7,7 @@
     <!-- Content Security Policy: block non-secure origins, but allow localhost for dev -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* ws://localhost:*; img-src 'self' data:;"
     />
   </head>
   <body>

@@ -1,4 +1,4 @@
-export const IPC = {
+export const IPC_CHANNELS = {
   SYSTEM: {
     GET_VERSION: "system:get-version",
     CHECK_UPDATE: "system:check-update",
