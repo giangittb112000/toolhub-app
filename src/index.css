@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-zinc-950: #09090b;
+  --color-zinc-900: #18181b;
+  --color-zinc-800: #27272a;
+  --color-orange-500: #f97316;
+}
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-zinc-50 font-sans;
+  }
+}
+
+/* Ensure drag region on macOS is clean for traffic lights */
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.no-drag-region {
+  -webkit-app-region: no-drag;
+}

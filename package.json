@@ -1,0 +1,54 @@
+{
+  "name": "toolhub-desktop",
+  "version": "1.0.0",
+  "description": "ToolHub Desktop — Developer Tools Suite",
+  "private": true,
+  "main": "dist/main/main.js",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "package:mac": "bun run build && electron-builder --mac",
+    "package:win": "bun run build && electron-builder --win",
+    "version:patch": "bun run scripts/bump-version.ts patch",
+    "version:minor": "bun run scripts/bump-version.ts minor",
+    "version:major": "bun run scripts/bump-version.ts major",
+    "release:patch": "bun run version:patch && bun run scripts/release.ts",
+    "release:minor": "bun run version:minor && bun run scripts/release.ts",
+    "release:major": "bun run version:major && bun run scripts/release.ts",
+    "lint": "biome check .",
+    "format": "biome format . --write"
+  },
+  "dependencies": {
+    "@toolhub/shared": "workspace:*",
+    "electron-log": "^5.4.3",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.8.3",
+    "express": "^5.2.1",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-json-view-lite": "^2.5.0",
+    "react-resizable-panels": "^4.7.1",
+    "react-router-dom": "^7.13.1",
+    "tailwindcss": "^4.2.1",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.6",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.5",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "electron": "^40.8.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}
