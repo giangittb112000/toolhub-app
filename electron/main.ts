@@ -1,14 +1,16 @@
+import { join } from "node:path";
 import { app, BrowserWindow } from "electron";
-import { join } from "path";
-import { registry } from "./core/registry";
-import { IpcRouter } from "./core/ipc-router";
-import Store from "electron-store";
 import log from "electron-log";
+import Store from "electron-store";
+import { IpcRouter } from "./core/ipc-router";
+import { registry } from "./core/registry";
 
 const isDev = !app.isPackaged;
 
 // Global Store
-const store = new Store();
+// Fix for ESM/CJS interop with electron-store
+const StoreConstructor = ((Store as any).default || Store) as typeof Store;
+const store = new StoreConstructor();
 
 async function createWindow() {
   const win = new BrowserWindow({
@@ -24,8 +26,8 @@ async function createWindow() {
     },
   });
 
-  if (isDev) {
-    win.loadURL("http://localhost:5173");
+  if (isDev && process.env.ELECTRON_RENDERER_URL) {
+    win.loadURL(process.env.ELECTRON_RENDERER_URL);
     win.webContents.openDevTools();
   } else {
     win.loadFile(join(__dirname, "../../renderer/index.html"));

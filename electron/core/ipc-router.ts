@@ -1,10 +1,13 @@
-import { ipcMain } from "electron";
 import type { IpcMainInvokeEvent } from "electron";
+import { ipcMain } from "electron";
 
 export class IpcRouter {
   handle<T>(
     channel: string,
-    handler: (event: IpcMainInvokeEvent, payload: T) => Promise<any> | any,
+    handler: (
+      event: IpcMainInvokeEvent,
+      payload: T,
+    ) => Promise<unknown> | unknown,
   ): void {
     ipcMain.handle(channel, async (event, payload) => {
       try {

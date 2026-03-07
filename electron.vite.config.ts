@@ -1,6 +1,6 @@
-import { defineConfig } from "electron-vite";
-import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "electron-vite";
 import { resolve } from "path";
 
 export default defineConfig({
@@ -11,21 +11,7 @@ export default defineConfig({
         input: {
           main: resolve(__dirname, "electron/main.ts"),
         },
-        external: [
-          "electron",
-          "electron-updater",
-          "electron-store",
-          "electron-log",
-          "express",
-          "os",
-          "path",
-          "fs",
-          "child_process",
-          "http",
-          "net",
-          "url",
-          "uuid",
-        ],
+        external: ["electron"],
       },
     },
     resolve: {

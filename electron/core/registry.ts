@@ -1,4 +1,4 @@
-import type { ToolHubModule, CoreContext } from "@toolhub/shared";
+import type { CoreContext, ToolHubModule } from "@toolhub/shared";
 import type { IpcRouter } from "./ipc-router";
 
 class ModuleRegistry {

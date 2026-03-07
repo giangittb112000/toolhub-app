@@ -23,7 +23,10 @@
     "format": "biome format . --write"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
     "@toolhub/shared": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "electron-log": "^5.4.3",
     "electron-store": "^11.0.2",
     "electron-updater": "^6.8.3",
@@ -34,6 +37,7 @@
     "react-json-view-lite": "^2.5.0",
     "react-resizable-panels": "^4.7.1",
     "react-router-dom": "^7.13.1",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.1",
     "uuid": "^13.0.0"
   },
