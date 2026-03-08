@@ -14,9 +14,19 @@ import { IPC_CHANNELS } from "@/constants/ipc-channels";
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [updateInfo, setUpdateInfo] = useState<CheckUpdateResponse | null>(null);
+  const [appVersion, setAppVersion] = useState<string>("1.0.0");
 
   useEffect(() => {
-    async function checkUpdate() {
+    async function initSystemData() {
+      try {
+        const verRes = (await window.electron.invoke(IPC_CHANNELS.SYSTEM.GET_VERSION)) as {
+          version: string;
+        };
+        setAppVersion(verRes.version);
+      } catch (err) {
+        console.error("Failed to fetch version", err);
+      }
+
       try {
         const res = await window.electron.invoke(IPC_CHANNELS.SYSTEM.CHECK_UPDATE);
         setUpdateInfo(res as CheckUpdateResponse);
@@ -24,7 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         console.error("Failed to check for updates:", err);
       }
     }
-    checkUpdate();
+    initSystemData();
   }, []);
 
   const navItems = [
@@ -46,7 +56,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Settings className="w-5 h-5 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
             ToolHub
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">Developer tools suite</p>
+          <p className="text-xs text-zinc-500 font-medium px-7 mt-0.5 tracking-wider">
+            v{appVersion}
+          </p>
         </div>
 
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-drag-region">

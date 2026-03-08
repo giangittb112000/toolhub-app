@@ -14,5 +14,9 @@ export const IPC_CHANNELS = {
     DELETE: "mock:delete-endpoint",
     CLEAR_ALL: "mock:clear-all",
     GET_PORT: "mock:get-http-port",
+    START: "mock:start-server",
+    STOP: "mock:stop-server",
+    STATUS: "mock:server-status",
+    SET_PORT: "mock:set-http-port",
   },
 } as const;

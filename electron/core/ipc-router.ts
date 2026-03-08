@@ -9,7 +9,7 @@ export class IpcRouter {
     ipcMain.handle(channel, async (event, payload) => {
       try {
         return await handler(event, payload);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`[IPC Error: ${channel}]`, error);
         throw error;
       }

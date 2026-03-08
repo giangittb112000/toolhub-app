@@ -73,14 +73,14 @@ export const systemModule: ToolHubModule = {
           releaseUrl: "",
           releaseNotes: "",
         } as CheckUpdateResponse;
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Update check failed:", error);
         return {
           needsUpdate: false,
           currentVersion: app.getVersion(),
           latestVersion: "error",
           releaseUrl: "",
-          releaseNotes: error.message,
+          releaseNotes: (error as Error).message,
         } as CheckUpdateResponse;
       }
     });

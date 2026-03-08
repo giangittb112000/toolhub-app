@@ -1,15 +1,15 @@
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { useAppFont } from "./hooks/useAppFont";
 import { Dashboard } from "./pages/Dashboard";
+import JsonFormatter from "./pages/modules/json-formatter";
+import MockApi from "./pages/modules/mock-api";
 import SystemMonitor from "./pages/modules/system-monitor";
 
-// Temporary basic components for Phase 2 navigation testing
-const MockApi = () => <div className="p-8 text-zinc-400">Mock API Module (Phase 4)</div>;
-const JsonFormatter = () => (
-  <div className="p-8 text-zinc-400">JSON Formatter Module (Phase 4)</div>
-);
-
 export function App() {
+  // Initialize global font on mount
+  useAppFont();
+
   return (
     <MemoryRouter>
       <Layout>

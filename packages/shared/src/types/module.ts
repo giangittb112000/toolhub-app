@@ -16,12 +16,12 @@ export interface ToolHubModule {
   onStop(): Promise<boolean>;
 
   /** Optional. If module needs IPC handlers, implement this. */
-  registerHandlers?(router: any): void; // any for now, we'll type it correctly later if needed
+  registerHandlers?(router: unknown): void;
 }
 
 export interface CoreContext {
   logger: Logger;
-  store: any; // electron-store instance
+  store: unknown; // electron-store instance
 }
 
 export interface Logger {

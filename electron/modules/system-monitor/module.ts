@@ -4,36 +4,45 @@ import { IPC_CHANNELS } from "../../../src/constants/ipc-channels";
 import type { IpcRouter } from "../../core/ipc-router";
 
 // Utility for calculating CPU usage percentage
-let previousCpuSnapshot: { idle: number; total: number } | null = null;
+let previousCpuSnapshot: { idle: number; total: number }[] | null = null;
 
-function getCpuSnapshot() {
+function getCpuSnapshots() {
   const cpus = os.cpus();
-  let idle = 0;
-  let total = 0;
-  for (const cpu of cpus) {
+  return cpus.map((cpu) => {
+    let total = 0;
     for (const type in cpu.times) {
       total += cpu.times[type as keyof typeof cpu.times];
     }
-    idle += cpu.times.idle;
-  }
-  return { idle, total };
+    return { idle: cpu.times.idle, total };
+  });
 }
 
-function calculateCpuUsage(): number {
-  const currentCpuSnapshot = getCpuSnapshot();
+function calculateCpuUsage(): { average: number; cores: number[] } {
+  const currentSnapshots = getCpuSnapshots();
 
-  if (!previousCpuSnapshot) {
-    previousCpuSnapshot = currentCpuSnapshot;
-    return 0; // Return 0% for the very first reading
+  if (!previousCpuSnapshot || previousCpuSnapshot.length !== currentSnapshots.length) {
+    previousCpuSnapshot = currentSnapshots;
+    return { average: 0, cores: currentSnapshots.map(() => 0) };
   }
 
-  const idleDifference = currentCpuSnapshot.idle - previousCpuSnapshot.idle;
-  const totalDifference = currentCpuSnapshot.total - previousCpuSnapshot.total;
+  let totalIdleDifference = 0;
+  let totalDifference = 0;
+  const corePercentages = currentSnapshots.map((current, i) => {
+    const previous = previousCpuSnapshot![i];
+    const idleDiff = current.idle - previous.idle;
+    const totalDiff = current.total - previous.total;
 
-  const percentageCpu = 100 - ~~((100 * idleDifference) / totalDifference);
+    totalIdleDifference += idleDiff;
+    totalDifference += totalDiff;
 
-  previousCpuSnapshot = currentCpuSnapshot;
-  return percentageCpu;
+    return totalDiff === 0 ? 0 : 100 - ~~((100 * idleDiff) / totalDiff);
+  });
+
+  const averagePercentage =
+    totalDifference === 0 ? 0 : 100 - ~~((100 * totalIdleDifference) / totalDifference);
+
+  previousCpuSnapshot = currentSnapshots;
+  return { average: averagePercentage, cores: corePercentages };
 }
 
 export const systemMonitorModule: ToolHubModule = {
@@ -48,7 +57,7 @@ export const systemMonitorModule: ToolHubModule = {
 
   async onStart(): Promise<boolean> {
     // Initial snapshot
-    previousCpuSnapshot = getCpuSnapshot();
+    previousCpuSnapshot = getCpuSnapshots();
     return true;
   },
 
@@ -70,11 +79,11 @@ export const systemMonitorModule: ToolHubModule = {
 
       return {
         cpu: {
-          average: Number(cpuUsage.toFixed(1)),
-          cores: cpus.map((cpu) => ({
+          average: Number(cpuUsage.average.toFixed(1)),
+          cores: cpus.map((cpu, index) => ({
             model: cpu.model,
             speed: cpu.speed,
-            percentage: 0, // Mock core percentage for now as we only calc average
+            percentage: Number(cpuUsage.cores[index].toFixed(1)),
           })),
         },
         memory: {

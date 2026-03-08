@@ -2,7 +2,7 @@
 declare global {
   interface Window {
     electron: {
-      invoke: (channel: string, payload?: unknown) => Promise<any>;
+      invoke: (channel: string, payload?: unknown) => Promise<unknown>;
       onUpdateReady: (cb: () => void) => void;
       installUpdate: () => Promise<void>;
     };
@@ -10,5 +10,5 @@ declare global {
 }
 
 export async function invoke<T>(channel: string, payload?: unknown): Promise<T> {
-  return window.electron.invoke(channel, payload);
+  return window.electron.invoke(channel, payload) as Promise<T>;
 }

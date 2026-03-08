@@ -6,17 +6,22 @@
     "output": "dist-electron",
     "buildResources": "assets"
   },
-  "files": ["dist/main/**", "dist/preload/**", "dist/renderer/**", "assets/**"],
+  "files": [
+    "dist/main/**/*",
+    "dist/preload/**/*",
+    "dist/renderer/**/*",
+    "assets/**/*"
+  ],
   "mac": {
     "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
     "category": "public.app-category.developer-tools",
-    "icon": "assets/icon.icns",
+    "icon": "assets/logo.icns",
     "hardenedRuntime": false,
     "gatekeeperAssess": false
   },
   "win": {
     "target": [{ "target": "nsis", "arch": ["x64"] }],
-    "icon": "assets/icon.ico"
+    "icon": "assets/logo.ico"
   },
   "nsis": {
     "oneClick": true,
