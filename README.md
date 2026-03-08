@@ -9,16 +9,16 @@ ToolHub can be automatically installed using our fast command-line installers:
 **macOS (Apple Silicon & Intel):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/giangittb112000/tool-hub/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/giangittb112000/toolhub-app/main/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell as Administrator):**
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/giangittb112000/tool-hub/main/scripts/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/giangittb112000/toolhub-app/main/scripts/install.ps1 | iex
 ```
 
-Alternatively, you can download the raw binaries (.dmg and .exe) directly from the [GitHub Releases](https://github.com/giangittb112000/tool-hub/releases/latest) page.
+Alternatively, you can download the raw binaries (.dmg and .exe) directly from the [GitHub Releases](https://github.com/giangittb112000/toolhub-app/releases/latest) page.
 
 ## Developer Quickstart
 

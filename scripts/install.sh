@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO="giangittb112000/tool-hub"
+REPO="giangittb112000/toolhub-app"
 ARCH=$(uname -m)  # arm64 or x86_64
 
 # Detect architecture

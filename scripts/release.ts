@@ -25,5 +25,5 @@ console.log(`\n✅ Tag ${tag} đã được push lên GitHub!`);
 console.log(`\n📦 Bước tiếp theo:`);
 console.log(`  1. Build:   bun run package:mac`);
 console.log(
-  `  2. Upload:  https://github.com/giangittb112000/tool-hub/releases/new?tag=${tag}`,
+  `  2. Upload:  https://github.com/giangittb112000/toolhub-app/releases/new?tag=${tag}`,
 );

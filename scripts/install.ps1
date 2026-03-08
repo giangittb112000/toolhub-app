@@ -1,4 +1,4 @@
-$repo = "giangittb112000/tool-hub"
+$repo = "giangittb112000/toolhub-app"
 $release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest"
 
 $asset = $release.assets | Where-Object { $_.name -like "*Setup*.exe" } | Select-Object -First 1
