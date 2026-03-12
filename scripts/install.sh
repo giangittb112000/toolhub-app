@@ -1,35 +1,63 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 REPO="giangittb112000/toolhub-app"
-ARCH=$(uname -m)  # arm64 or x86_64
+OS="$(uname -s)"
+ARCH="$(uname -m)"
 
-# Detect architecture
-if [ "$ARCH" = "arm64" ]; then
-  ASSET_NAME="ToolHub-*-arm64.dmg"
-else
-  ASSET_NAME="ToolHub-*-x64.dmg"
-fi
-
-# Get latest release download URL
-DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest" \
-  | grep "browser_download_url" \
-  | grep "$ASSET_NAME" \
-  | cut -d'"' -f4)
-
-if [ -z "$DOWNLOAD_URL" ]; then
-  echo "❌ Error: Could not find a suitable release for your architecture ($ARCH) on GitHub."
+# ─── OS Guard ──────────────────────────────────────────────────────────────────
+if [ "$OS" != "Darwin" ]; then
+  echo "❌ This installer only supports macOS."
+  echo "   For Windows, run the PowerShell installer instead:"
+  echo "   iwr -useb https://raw.githubusercontent.com/${REPO}/main/scripts/install.ps1 | iex"
   exit 1
 fi
 
-echo "⬇️  Downloading ToolHub..."
+# ─── Architecture detection ────────────────────────────────────────────────────
+if [ "$ARCH" = "arm64" ]; then
+  ASSET_SUFFIX="arm64.dmg"
+elif [ "$ARCH" = "x86_64" ]; then
+  ASSET_SUFFIX="x64.dmg"   # Intel mac (non-arm)
+else
+  echo "❌ Unsupported architecture: $ARCH"
+  exit 1
+fi
+
+echo "🔍 Detected: macOS ($ARCH)"
+
+# ─── Fetch latest release URL ──────────────────────────────────────────────────
+API_URL="https://api.github.com/repos/${REPO}/releases/latest"
+DOWNLOAD_URL=$(curl -fsSL "$API_URL" \
+  | grep "browser_download_url" \
+  | grep "${ASSET_SUFFIX}" \
+  | cut -d'"' -f4 \
+  | head -n1)
+
+if [ -z "$DOWNLOAD_URL" ]; then
+  echo "❌ Could not find a release asset matching: *${ASSET_SUFFIX}"
+  echo "   Check available releases at: https://github.com/${REPO}/releases/latest"
+  exit 1
+fi
+
+echo "⬇️  Downloading: $DOWNLOAD_URL"
+
+# ─── Download & install ────────────────────────────────────────────────────────
 TMP=$(mktemp -d)
-curl -L -o "$TMP/ToolHub.dmg" "$DOWNLOAD_URL"
+DMG="$TMP/ToolHub.dmg"
+MOUNT="/Volumes/ToolHub_Install"
 
-echo "📦 Installing..."
-hdiutil attach "$TMP/ToolHub.dmg" -mountpoint /Volumes/ToolHub -quiet
-cp -r "/Volumes/ToolHub/ToolHub.app" /Applications/
-hdiutil detach /Volumes/ToolHub -quiet
-rm -rf "$TMP"
+# Cleanup on exit (success or error)
+trap 'hdiutil detach "$MOUNT" -quiet 2>/dev/null || true; rm -rf "$TMP"' EXIT
 
-echo "✅ ToolHub installed successfully to /Applications/ToolHub.app"
+curl -L --progress-bar -o "$DMG" "$DOWNLOAD_URL"
+
+echo "📦 Installing to /Applications..."
+hdiutil attach "$DMG" -mountpoint "$MOUNT" -quiet -nobrowse
+
+if [ ! -d "$MOUNT/ToolHub.app" ]; then
+  echo "❌ ToolHub.app not found inside the .dmg"
+  exit 1
+fi
+
+cp -r "$MOUNT/ToolHub.app" /Applications/
+echo "✅ ToolHub installed successfully → /Applications/ToolHub.app"

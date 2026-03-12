@@ -10,10 +10,26 @@ import { systemMonitorModule } from "./modules/system-monitor/module";
 
 const isDev = !app.isPackaged;
 
+/**
+ * Resolves the absolute path to the app icon based on the current platform.
+ * - macOS  → .icns (used for dev window; production uses the .app bundle icon)
+ * - Windows → .ico
+ * - Others  → .png
+ */
+function resolveAppIcon(): string {
+  const iconByPlatform: Partial<Record<NodeJS.Platform, string>> = {
+    darwin: "logo.icns",
+    win32: "logo.ico",
+  };
+  const iconFile = iconByPlatform[process.platform] ?? "icon.png";
+  const assetsDir = isDev ? "../assets" : "../../assets";
+  return join(__dirname, assetsDir, iconFile);
+}
+
 // Global Store
 // Fix for ESM/CJS interop with electron-store
-const StoreConstructor = ((Store as unknown as { default?: typeof Store }).default ||
-  Store) as typeof Store;
+const StoreConstructor = ((Store as unknown as { default?: typeof Store })
+  .default || Store) as typeof Store;
 const store = new StoreConstructor();
 
 async function createWindow() {
@@ -24,17 +40,18 @@ async function createWindow() {
     minHeight: 600,
     titleBarStyle: "hiddenInset",
     webPreferences: {
-      preload: join(__dirname, "../preload/preload.js"), // note: path after build is dist/preload/preload.js if called from dist/main/
+      preload: join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
+    icon: resolveAppIcon(),
   });
 
   if (isDev && process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
     win.webContents.openDevTools();
   } else {
-    win.loadFile(join(__dirname, "../../renderer/index.html"));
+    win.loadFile(join(__dirname, "../renderer/index.html"));
   }
 }
 
