@@ -1,6 +1,6 @@
 {
   "name": "toolhub-desktop",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "ToolHub Desktop — Developer Tools Suite",
   "private": true,
   "main": "dist/main/main.js",

@@ -74,9 +74,9 @@ Prefer to download manually? Grab the latest binaries from the [**Releases page*
 
 | Platform | File | Notes |
 |----------|------|-------|
-| macOS Apple Silicon | `ToolHub-x.x.x-arm64.dmg` | M1 / M2 / M3 / M4 |
-| macOS Intel | `ToolHub-x.x.x.dmg` | x86_64 |
-| Windows | `ToolHub-x.x.x.exe` | NSIS silent installer |
+| macOS Apple Silicon | `ToolHub-arm64.dmg` | M1 / M2 / M3 / M4 |
+| macOS Intel | `ToolHub-x64.dmg` | x86_64 |
+| Windows | `ToolHub-x64.exe` | NSIS silent installer |
 
 ---
 

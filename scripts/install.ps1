@@ -14,7 +14,7 @@ $release = Invoke-RestMethod -Uri $apiUrl -UseBasicParsing
 
 # Match the exact asset pattern electron-builder produces: ToolHub-<version>.exe (NSIS installer)
 # electron-builder NSIS output does NOT include "Setup" by default — filename is e.g. ToolHub-1.0.1.exe
-$asset = $release.assets | Where-Object { $_.name -match "ToolHub-[\d\.]+-x64\.exe$" } | Select-Object -First 1
+$asset = $release.assets | Where-Object { $_.name -match "ToolHub-x64\.exe$" } | Select-Object -First 1
 
 # Fallback: match any .exe if strict pattern didn't match
 if (-not $asset) {
