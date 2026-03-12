@@ -1,41 +1,70 @@
-import type { CheckUpdateResponse } from "@shared/index";
+
 import {
   Activity,
   DownloadCloud,
   FileJson,
   LayoutDashboard,
+  Loader2,
   Network,
   Settings,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { IPC_CHANNELS } from "@/constants/ipc-channels";
+import { IPC_CHANNELS, IPC_EVENTS } from "@/constants/ipc-channels";
+import type { DownloadProgress } from "@/store/update";
+import { useUpdateStore } from "@/store/update";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [updateInfo, setUpdateInfo] = useState<CheckUpdateResponse | null>(null);
   const [appVersion, setAppVersion] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function initSystemData() {
-      try {
-        const verRes = (await window.electron.invoke(IPC_CHANNELS.SYSTEM.GET_VERSION)) as {
-          version: string;
-        };
-        setAppVersion(verRes.version);
-      } catch (err) {
-        console.error("Failed to fetch version", err);
-      }
+  const { updateInfo, isDownloading, downloadProgress, setDownloadState } =
+    useUpdateStore();
 
-      try {
-        const res = await window.electron.invoke(IPC_CHANNELS.SYSTEM.CHECK_UPDATE);
-        setUpdateInfo(res as CheckUpdateResponse);
-      } catch (err) {
-        console.error("Failed to check for updates:", err);
-      }
-    }
-    initSystemData();
+  // Fetch app version once on mount — but do NOT auto-check for updates
+  useEffect(() => {
+    window.electron
+      .invoke(IPC_CHANNELS.SYSTEM.GET_VERSION)
+      .then((res) => {
+        const r = res as { version: string };
+        setAppVersion(r.version);
+      })
+      .catch(() => {/* silently ignore */});
   }, []);
+
+  // Listen to download progress events from main process
+  useEffect(() => {
+    const offProgress = window.electron.on(
+      IPC_EVENTS.UPDATE_DOWNLOAD_PROGRESS,
+      (data) => {
+        const p = data as DownloadProgress;
+        setDownloadState(true, p);
+      },
+    );
+
+    const offDone = window.electron.on(IPC_EVENTS.UPDATE_DOWNLOAD_DONE, () => {
+      setDownloadState(false, undefined);
+    });
+
+    const offError = window.electron.on(
+      IPC_EVENTS.UPDATE_DOWNLOAD_ERROR,
+      () => {
+        setDownloadState(false, undefined);
+      },
+    );
+
+    return () => {
+      offProgress();
+      offDone();
+      offError();
+    };
+  }, [setDownloadState]);
+
+  const handleDownloadUpdate = () => {
+    if (isDownloading) return;
+    setDownloadState(true, { percent: 0, transferred: 0, total: 0 });
+    window.electron.invoke(IPC_CHANNELS.SYSTEM.DOWNLOAD_UPDATE);
+  };
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -82,7 +111,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Dynamic Update Banner */}
+        {/* Update banner — only shown after user manually checks and an update is found */}
         <div className="p-4 mt-auto">
           {updateInfo?.needsUpdate && (
             <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 backdrop-blur-md shadow-[0_0_15px_-5px_rgba(249,115,22,0.3)]">
@@ -93,14 +122,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <p className="text-xs text-zinc-400 mb-3">
                 Version {updateInfo.latestVersion} is ready.
               </p>
+
+              {/* Download progress bar */}
+              {isDownloading && downloadProgress && (
+                <div className="mb-2">
+                  <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                    <span className="flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Downloading...
+                    </span>
+                    <span>{downloadProgress.percent}%</span>
+                  </div>
+                  <div className="w-full bg-zinc-800 rounded-full h-1.5">
+                    <div
+                      className="bg-gradient-to-r from-orange-600 to-orange-400 h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${downloadProgress.percent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
-                className="w-full text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-400 hover:brightness-110 text-white py-1.5 rounded-md transition-all drop-shadow-md"
-                onClick={() =>
-                  window.electron.invoke(IPC_CHANNELS.SYSTEM.PERFORM_UPDATE, updateInfo)
-                }
+                disabled={isDownloading}
+                className="w-full text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-400 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed text-white py-1.5 rounded-md transition-all drop-shadow-md"
+                onClick={handleDownloadUpdate}
               >
-                Download & Install
+                {isDownloading ? "Downloading..." : "Download & Install"}
               </button>
             </div>
           )}

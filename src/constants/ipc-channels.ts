@@ -3,6 +3,7 @@ export const IPC_CHANNELS = {
     GET_VERSION: "system:get-version",
     CHECK_UPDATE: "system:check-update",
     PERFORM_UPDATE: "system:perform-update",
+    DOWNLOAD_UPDATE: "system:download-update",
   },
   MONITOR: {
     GET_STATS: "monitor:get-stats",
@@ -19,4 +20,11 @@ export const IPC_CHANNELS = {
     STATUS: "mock:server-status",
     SET_PORT: "mock:set-http-port",
   },
+} as const;
+
+/** Push events sent FROM main process TO renderer (not invoke/handle). */
+export const IPC_EVENTS = {
+  UPDATE_DOWNLOAD_PROGRESS: "update:download-progress",
+  UPDATE_DOWNLOAD_DONE: "update:download-done",
+  UPDATE_DOWNLOAD_ERROR: "update:download-error",
 } as const;

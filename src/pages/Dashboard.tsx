@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { IPC_CHANNELS } from "@/constants/ipc-channels";
 import { useAppFont } from "@/hooks/useAppFont";
+import { useUpdateStore } from "@/store/update";
 
 // Mock Data for Phase 2
 const mockModules = [
@@ -51,6 +52,9 @@ export function Dashboard() {
   const [appVersion, setAppVersion] = useState<string | null>(null);
   const [mockApiRunning, setMockApiRunning] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [checkMessage, setCheckMessage] = useState<string | null>(null);
+
+  const { setUpdateInfo } = useUpdateStore();
 
   useEffect(() => {
     async function fetchSystemData() {
@@ -82,25 +86,27 @@ export function Dashboard() {
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true);
+    setCheckMessage(null);
     try {
       const updateRes = (await window.electron.invoke(
         IPC_CHANNELS.SYSTEM.CHECK_UPDATE,
       )) as CheckUpdateResponse;
 
+      // Write result into the shared store → Layout will show/hide banner
+      setUpdateInfo(updateRes);
+
       if (updateRes?.needsUpdate) {
-        // The Layout component already has an effect that polls this on mount,
-        // but since we want to trigger it manually here, we just notify the user
-        // via alert for simplicity (or let the Layout component's banner handle the UI).
-        // Since the user wants an explicit action here, we'll show an alert.
-        alert(
-          `Good news! A new version (v${updateRes.latestVersion}) is available. Please check the sidebar to download and install!`,
-        );
+        setCheckMessage(`✨ v${updateRes.latestVersion} is available — see sidebar`);
       } else {
-        alert("You are on the latest version!");
+        setCheckMessage("✅ You're on the latest version!");
       }
+
+      // Clear feedback message after 4s
+      setTimeout(() => setCheckMessage(null), 4000);
     } catch (err) {
       console.error(err);
-      alert("Failed to check for updates. Please try again later.");
+      setCheckMessage("❌ Failed to check for updates.");
+      setTimeout(() => setCheckMessage(null), 4000);
     } finally {
       setIsCheckingUpdate(false);
     }
@@ -114,16 +120,23 @@ export function Dashboard() {
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
               Dashboard
             </h1>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCheckUpdate}
-              disabled={isCheckingUpdate}
-              className="bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 gap-2 h-8"
-            >
-              <DownloadCloud className={`w-4 h-4 ${isCheckingUpdate ? "animate-pulse" : ""}`} />
-              {isCheckingUpdate ? "Checking..." : "Check for Updates"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCheckUpdate}
+                disabled={isCheckingUpdate}
+                className="bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 gap-2 h-8"
+              >
+                <DownloadCloud className={`w-4 h-4 ${isCheckingUpdate ? "animate-pulse" : ""}`} />
+                {isCheckingUpdate ? "Checking..." : "Check for Updates"}
+              </Button>
+              {checkMessage && (
+                <span className="text-xs text-zinc-400 animate-in fade-in duration-300">
+                  {checkMessage}
+                </span>
+              )}
+            </div>
           </div>
           <p className="text-zinc-400 mt-1">Manage your active ToolHub modules.</p>
         </div>

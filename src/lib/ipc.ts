@@ -1,10 +1,14 @@
-// Define the global window.electron type
 declare global {
   interface Window {
     electron: {
+      /** Invoke a main-process IPC handler and get back a result. */
       invoke: (channel: string, payload?: unknown) => Promise<unknown>;
-      onUpdateReady: (cb: () => void) => void;
-      installUpdate: () => Promise<void>;
+
+      /**
+       * Subscribe to a push event from the main process.
+       * Returns an unsubscribe function — call it in useEffect cleanup.
+       */
+      on: (channel: string, callback: (data: unknown) => void) => () => void;
     };
   }
 }
