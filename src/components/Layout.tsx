@@ -14,7 +14,7 @@ import { IPC_CHANNELS } from "@/constants/ipc-channels";
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [updateInfo, setUpdateInfo] = useState<CheckUpdateResponse | null>(null);
-  const [appVersion, setAppVersion] = useState<string>("1.0.0");
+  const [appVersion, setAppVersion] = useState<string | null>(null);
 
   useEffect(() => {
     async function initSystemData() {
@@ -57,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ToolHub
           </h2>
           <p className="text-xs text-zinc-500 font-medium px-7 mt-0.5 tracking-wider">
-            v{appVersion}
+            {appVersion ? `v${appVersion}` : "..."}
           </p>
         </div>
 
@@ -96,7 +96,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 className="w-full text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-400 hover:brightness-110 text-white py-1.5 rounded-md transition-all drop-shadow-md"
-                onClick={() => window.electron.invoke(IPC_CHANNELS.SYSTEM.PERFORM_UPDATE)}
+                onClick={() =>
+                  window.electron.invoke(IPC_CHANNELS.SYSTEM.PERFORM_UPDATE, updateInfo)
+                }
               >
                 Download & Install
               </button>

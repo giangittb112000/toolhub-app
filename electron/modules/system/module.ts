@@ -4,10 +4,13 @@ import type {
   GetVersionResponse,
   ToolHubModule,
 } from "@shared/index";
-import { app } from "electron";
-import { autoUpdater } from "electron-updater";
+import { app, shell } from "electron";
 import { IPC_CHANNELS } from "../../../src/constants/ipc-channels";
 import type { IpcRouter } from "../../core/ipc-router";
+
+const GITHUB_REPO = "giangittb112000/toolhub-app";
+const GITHUB_RELEASES_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+const GITHUB_RELEASES_URL = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
 export const systemModule: ToolHubModule = {
   id: "core.system",
@@ -17,23 +20,18 @@ export const systemModule: ToolHubModule = {
 
   async onInit(context: CoreContext): Promise<void> {
     context.logger.info("System Module initializing...");
-    // Cấu hình auto-updater
-    autoUpdater.logger = context.logger;
-    autoUpdater.autoDownload = false; // We'll trigger download manually via IPC
   },
 
   async onStart(): Promise<boolean> {
-    // Không cần chạy service ngầm nào ở đây
     return true;
   },
 
   async onStop(): Promise<boolean> {
-    // Cleanup if needed
     return true;
   },
 
   registerHandlers(router: IpcRouter) {
-    // 1. Get system version
+    // 1. Get current app version (from the packaged binary — always accurate)
     router.handle<void>(IPC_CHANNELS.SYSTEM.GET_VERSION, async () => {
       return {
         version: app.getVersion(),
@@ -42,53 +40,63 @@ export const systemModule: ToolHubModule = {
       } as GetVersionResponse;
     });
 
-    // 2. Check for updates
+    // 2. Check for updates via GitHub Releases API
+    //    — Works without uploading latest.yml to the release.
+    //    — Works in both packaged and dev mode.
     router.handle<void>(IPC_CHANNELS.SYSTEM.CHECK_UPDATE, async () => {
-      try {
-        if (!app.isPackaged) {
-          return {
-            needsUpdate: false,
-            currentVersion: app.getVersion(),
-            latestVersion: "dev",
-            releaseUrl: "",
-            releaseNotes: "Dev mode",
-          } as CheckUpdateResponse;
-        }
+      const currentVersion = app.getVersion();
 
-        const result = await autoUpdater.checkForUpdates();
-        if (result && result.updateInfo.version !== app.getVersion()) {
-          return {
-            needsUpdate: true,
-            currentVersion: app.getVersion(),
-            latestVersion: result.updateInfo.version,
-            releaseUrl: "",
-            releaseNotes: result.updateInfo.releaseNotes?.toString() || "New version available",
-          } as CheckUpdateResponse;
-        }
-
+      if (!app.isPackaged) {
         return {
           needsUpdate: false,
-          currentVersion: app.getVersion(),
-          latestVersion: app.getVersion(),
-          releaseUrl: "",
-          releaseNotes: "",
+          currentVersion,
+          latestVersion: currentVersion,
+          releaseUrl: GITHUB_RELEASES_URL,
+          releaseNotes: "Running in dev mode — update check skipped.",
+        } as CheckUpdateResponse;
+      }
+
+      try {
+        const response = await fetch(GITHUB_RELEASES_API, {
+          headers: { "User-Agent": "ToolHub-Desktop-Updater" },
+        });
+
+        if (!response.ok) {
+          throw new Error(`GitHub API responded with ${response.status}`);
+        }
+
+        const release = (await response.json()) as {
+          tag_name: string;
+          html_url: string;
+          body: string;
+        };
+
+        // Strip the leading "v" from the tag name (e.g. "v1.0.4" → "1.0.4")
+        const latestVersion = release.tag_name.replace(/^v/, "");
+        const needsUpdate = latestVersion !== currentVersion;
+
+        return {
+          needsUpdate,
+          currentVersion,
+          latestVersion,
+          releaseUrl: release.html_url,
+          releaseNotes: release.body || "",
         } as CheckUpdateResponse;
       } catch (error: unknown) {
-        console.error("Update check failed:", error);
         return {
           needsUpdate: false,
-          currentVersion: app.getVersion(),
-          latestVersion: "error",
-          releaseUrl: "",
-          releaseNotes: (error as Error).message,
+          currentVersion,
+          latestVersion: "unknown",
+          releaseUrl: GITHUB_RELEASES_URL,
+          releaseNotes: `Update check failed: ${(error as Error).message}`,
         } as CheckUpdateResponse;
       }
     });
 
-    // 3. Perform update (download and install)
-    router.handle<void>(IPC_CHANNELS.SYSTEM.PERFORM_UPDATE, async () => {
-      if (!app.isPackaged) return;
-      await autoUpdater.downloadUpdate();
+    // 3. Open the GitHub releases page in the system browser for the user to download
+    router.handle<void>(IPC_CHANNELS.SYSTEM.PERFORM_UPDATE, async (_payload, _event, updateInfo?: CheckUpdateResponse) => {
+      const url = updateInfo?.releaseUrl || GITHUB_RELEASES_URL;
+      shell.openExternal(url);
     });
   },
 };

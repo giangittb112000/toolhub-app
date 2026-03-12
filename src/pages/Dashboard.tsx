@@ -48,7 +48,7 @@ const mockModules = [
 
 export function Dashboard() {
   const navigate = useNavigate();
-  const [appVersion, setAppVersion] = useState("Loading...");
+  const [appVersion, setAppVersion] = useState<string | null>(null);
   const [mockApiRunning, setMockApiRunning] = useState(false);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
 
@@ -60,7 +60,7 @@ export function Dashboard() {
         };
         setAppVersion(res.version);
       } catch (_e) {
-        setAppVersion("1.0.0"); // Fallback
+        setAppVersion(null); // IPC unavailable, hide version
       }
 
       try {
@@ -167,7 +167,8 @@ export function Dashboard() {
           }
 
           // Inject real app version into the UI for the core tools
-          const displayVersion = mod.id === "system-monitor" ? appVersion : mod.version;
+          const displayVersion =
+            mod.id === "system-monitor" ? (appVersion ?? "...") : mod.version;
 
           return (
             <Card key={mod.id} className="flex flex-col">
