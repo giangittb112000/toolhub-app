@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/icon.png" alt="ToolHub Logo" width="120" />
+  <img src="assets/logo.png" alt="ToolHub Logo" width="120" />
 
   <h1>ToolHub Desktop</h1>
 
@@ -23,7 +23,9 @@
 
   <!-- DEMO SCREENSHOT — Replace the block below with your own screenshot(s) -->
   <!-- ![ToolHub Demo](assets/demo.png) -->
-  > 📸 **Demo screenshot coming soon** — replace this line with `![ToolHub Demo](assets/demo.png)`
+
+> 📸 **Demo screenshot coming soon** — replace this line with `![ToolHub Demo](assets/demo.png)`
+
   <!-- END DEMO SCREENSHOT -->
 
 </div>
@@ -72,11 +74,11 @@ iwr -useb https://raw.githubusercontent.com/giangittb112000/toolhub-app/main/scr
 
 Prefer to download manually? Grab the latest binaries from the [**Releases page**](https://github.com/giangittb112000/toolhub-app/releases/latest):
 
-| Platform | File | Notes |
-|----------|------|-------|
-| macOS Apple Silicon | `ToolHub-arm64.dmg` | M1 / M2 / M3 / M4 |
-| macOS Intel | `ToolHub-x64.dmg` | x86_64 |
-| Windows | `ToolHub-x64.exe` | NSIS silent installer |
+| Platform            | File                | Notes                 |
+| ------------------- | ------------------- | --------------------- |
+| macOS Apple Silicon | `ToolHub-arm64.dmg` | M1 / M2 / M3 / M4     |
+| macOS Intel         | `ToolHub-x64.dmg`   | x86_64                |
+| Windows             | `ToolHub-x64.exe`   | NSIS silent installer |
 
 ---
 

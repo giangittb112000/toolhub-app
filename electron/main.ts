@@ -11,19 +11,14 @@ import { systemMonitorModule } from "./modules/system-monitor/module";
 const isDev = !app.isPackaged;
 
 /**
- * Resolves the absolute path to the app icon based on the current platform.
- * - macOS  → .icns (used for dev window; production uses the .app bundle icon)
- * - Windows → .ico
- * - Others  → .png
+ * Resolves the absolute path to the app icon (logo.png).
+ * - macOS production: dock icon comes from the .app bundle (auto-converted by electron-builder)
+ * - Windows: used for taskbar and window icon at runtime
+ * - All platforms use the same PNG — no platform-specific formats needed
  */
 function resolveAppIcon(): string {
-  const iconByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-    darwin: "logo.icns",
-    win32: "logo.ico",
-  };
-  const iconFile = iconByPlatform[process.platform] ?? "icon.png";
   const assetsDir = isDev ? "../assets" : "../../assets";
-  return join(__dirname, assetsDir, iconFile);
+  return join(__dirname, assetsDir, "logo.png");
 }
 
 // Global Store

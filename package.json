@@ -1,6 +1,6 @@
 {
   "name": "toolhub-desktop",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "ToolHub Desktop — Developer Tools Suite",
   "private": true,
   "main": "dist/main/main.js",
@@ -12,8 +12,8 @@
     "dev": "electron-vite dev",
     "build": "bun run clean && electron-vite build",
     "preview": "electron-vite preview",
-    "package:mac": "electron-builder --mac",
-    "package:win": "electron-builder --win",
+    "package:mac": "bun run build && electron-builder --mac",
+    "package:win": "bun run build && electron-builder --win",
     "release:patch": "bun run scripts/release.ts patch",
     "release:minor": "bun run scripts/release.ts minor",
     "release:major": "bun run scripts/release.ts major",

@@ -15,14 +15,14 @@
   "mac": {
     "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
     "category": "public.app-category.developer-tools",
-    "icon": "assets/logo.icns",
+    "icon": "assets/logo.png",
     "artifactName": "${productName}-${arch}.${ext}",
     "hardenedRuntime": false,
     "gatekeeperAssess": false
   },
   "win": {
     "target": [{ "target": "nsis", "arch": ["x64"] }],
-    "icon": "assets/logo.ico",
+    "icon": "assets/logo.png",
     "artifactName": "${productName}-${arch}.${ext}"
   },
   "nsis": {
