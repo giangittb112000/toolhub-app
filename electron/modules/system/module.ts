@@ -26,6 +26,19 @@ function getAssetName(): string {
   return "";
 }
 
+/** Simple semver-like comparison: returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal */
+function compareVersions(v1: string, v2: string): number {
+  const p1 = v1.replace(/^v/, "").split(".").map(Number);
+  const p2 = v2.replace(/^v/, "").split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    const n1 = p1[i] || 0;
+    const n2 = p2[i] || 0;
+    if (n1 > n2) return 1;
+    if (n1 < n2) return -1;
+  }
+  return 0;
+}
+
 export const systemModule: ToolHubModule = {
   id: "core.system",
   name: "System Module",
@@ -86,7 +99,11 @@ export const systemModule: ToolHubModule = {
         };
 
         const latestVersion = release.tag_name.replace(/^v/, "");
-        const needsUpdate = latestVersion !== currentVersion;
+        
+        // Use compareVersions instead of simple inequality.
+        // Needs update ONLY if GitHub (latest) is strictly greater than Local (current).
+        const versionMatch = compareVersions(latestVersion, currentVersion);
+        const needsUpdate = versionMatch > 0;
 
         return {
           needsUpdate,
@@ -139,7 +156,8 @@ export const systemModule: ToolHubModule = {
         if (!asset) {
           // Release exists but asset not uploaded yet — open releases page
           event.sender.send(IPC_EVENTS.UPDATE_DOWNLOAD_ERROR, {
-            message: "Asset not found in release. Opening GitHub releases page...",
+            message:
+              "Asset not found in release. Opening GitHub releases page...",
             fallback: true,
           });
           shell.openExternal(release.html_url || GITHUB_RELEASES_PAGE);
