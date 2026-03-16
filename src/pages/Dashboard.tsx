@@ -5,6 +5,7 @@ import {
   FileJson,
   Network,
   Search,
+  Globe,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +45,15 @@ const mockModules = [
     status: "Running",
     path: "/modules/json-formatter",
     icon: FileJson,
+  },
+  {
+    id: "web-to-markdown",
+    name: "Web to Markdown",
+    description: "Convert any URL into clean Markdown for AI agents and LLMs.",
+    version: "1.0.0",
+    status: "Stopped",
+    path: "/modules/web-to-markdown",
+    icon: Globe,
   },
 ];
 

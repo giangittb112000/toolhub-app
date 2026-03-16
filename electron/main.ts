@@ -7,6 +7,7 @@ import { registry } from "./core/registry";
 import { mockApiModule } from "./modules/mock-api/module";
 import { systemModule } from "./modules/system/module";
 import { systemMonitorModule } from "./modules/system-monitor/module";
+import { webToMdModule } from "./modules/web-to-markdown/module";
 
 const isDev = !app.isPackaged;
 
@@ -57,6 +58,7 @@ app.whenReady().then(async () => {
   registry.register(systemModule);
   registry.register(systemMonitorModule);
   registry.register(mockApiModule);
+  registry.register(webToMdModule);
 
   // Initialize ALL registered modules
   await registry.initAll({ logger: log, store });

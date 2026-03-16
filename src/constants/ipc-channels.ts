@@ -20,6 +20,9 @@ export const IPC_CHANNELS = {
     STATUS: "mock:server-status",
     SET_PORT: "mock:set-http-port",
   },
+  WEB_TO_MD: {
+    CONVERT: "web-to-md:convert",
+  },
 } as const;
 
 /** Push events sent FROM main process TO renderer (not invoke/handle). */

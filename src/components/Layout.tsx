@@ -3,6 +3,7 @@ import {
   Activity,
   DownloadCloud,
   FileJson,
+  Globe,
   LayoutDashboard,
   Loader2,
   Network,
@@ -67,10 +68,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const navItems = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
     { name: "System Monitor", path: "/modules/system-monitor", icon: Activity },
     { name: "Mock API", path: "/modules/mock-api", icon: Network },
     { name: "JSON Formatter", path: "/modules/json-formatter", icon: FileJson },
+    { name: "Web to Markdown", path: "/modules/web-to-markdown", icon: Globe },
   ];
 
   return (
@@ -80,35 +81,61 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* macOS Traffic Lights drag region padding */}
         <div className="drag-region h-6 w-full shrink-0 mb-4" />
 
-        <div className="px-4 pb-4">
-          <h2 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
-            <Settings className="w-5 h-5 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
-            ToolHub
-          </h2>
-          <p className="text-xs text-zinc-500 font-medium px-7 mt-0.5 tracking-wider">
-            {appVersion ? `v${appVersion}` : "..."}
-          </p>
+        <div className="px-5 pb-6">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-orange-500 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                <Settings className="w-5 h-5 text-white" />
+             </div>
+             <div>
+                <h2 className="text-lg font-black text-white tracking-tight leading-none">
+                  ToolHub
+                </h2>
+                <p className="text-[10px] text-zinc-500 font-bold mt-1 uppercase tracking-tighter">
+                  {appVersion ? `Version ${appVersion}` : "Loading..."}
+                </p>
+             </div>
+          </div>
         </div>
 
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-drag-region">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-out active:scale-95 ${
-                  isActive
-                    ? "bg-orange-500/10 text-orange-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-orange-500/20"
-                    : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {item.name}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-3 space-y-6 overflow-y-auto no-drag-region pt-2">
+          {/* Main Section */}
+          <div className="space-y-1">
+            <p className="px-3 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Main</p>
+            <Link
+              to="/"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 group ${
+                location.pathname === "/"
+                  ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
+                  : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+              }`}
+            >
+              <LayoutDashboard className={`w-4 h-4 ${location.pathname === "/" ? "text-white" : "text-zinc-500 group-hover:text-orange-400"}`} />
+              Dashboard
+            </Link>
+          </div>
+
+          {/* Modules Section */}
+          <div className="space-y-1">
+            <p className="px-3 text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Modules</p>
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 group ${
+                    isActive
+                      ? "bg-orange-600/10 text-orange-400 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.05)]"
+                      : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? "text-orange-400" : "text-zinc-600 group-hover:text-orange-400"}`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Update banner — only shown after user manually checks and an update is found */}
